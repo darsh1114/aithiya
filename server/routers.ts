@@ -2,7 +2,9 @@ import { COOKIE_NAME } from "@shared/const";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { cultureCategories } from "../shared/culture";
+import { importCuratedCulturePilot } from "./cultureImport";
 import { getApprovedCultureRecordBySlug, listApprovedCultureRecords } from "./cultureRepository";
+import { ENV } from "./_core/env";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
@@ -10,6 +12,13 @@ import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (ctx.user.role !== "admin") {
     throw new TRPCError({ code: "FORBIDDEN", message: "Administrator access is required." });
+  }
+  return next({ ctx });
+});
+
+const ownerProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (!ENV.ownerOpenId || ctx.user.openId !== ENV.ownerOpenId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Owner access is required." });
   }
   return next({ ctx });
 });
@@ -52,6 +61,7 @@ export const appRouter = router({
       const { database } = await pingCultureDatabase();
       return { connected: true, database };
     }),
+    importCuratedPilot: ownerProcedure.mutation(() => importCuratedCulturePilot()),
   }),
 
 });

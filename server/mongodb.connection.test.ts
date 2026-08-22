@@ -1,6 +1,6 @@
 import { afterAll, describe, expect, it } from "vitest";
 import type { TrpcContext } from "./_core/context";
-import { closeMongoClientForTests } from "./mongodb";
+import { closeMongoClient } from "./mongodb";
 import { appRouter } from "./routers";
 
 function createAdminContext(): TrpcContext {
@@ -23,7 +23,7 @@ function createAdminContext(): TrpcContext {
 
 describe("culture.connectionStatus", () => {
   afterAll(async () => {
-    await closeMongoClientForTests();
+    await closeMongoClient();
   });
 
   it("uses MONGODB_URI to reach the configured Atlas database through the tRPC endpoint", async () => {

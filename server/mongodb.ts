@@ -65,8 +65,8 @@ export async function pingCultureDatabase(): Promise<{ database: string }> {
   return { database: getCultureDatabaseName() };
 }
 
-/** Test-only cleanup for a process that should otherwise keep a reusable MongoDB client. */
-export async function closeMongoClientForTests(): Promise<void> {
+/** Close the reusable MongoDB client for one-off scripts and test processes. */
+export async function closeMongoClient(): Promise<void> {
   const activeClient = client;
   client = null;
   clientPromise = null;

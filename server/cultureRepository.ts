@@ -10,7 +10,7 @@ type CultureRecordDocument = Omit<CultureRecord, "id"> & {
   searchText: string;
 };
 
-type CreateCultureRecord = Omit<CultureRecord, "id" | "createdAt" | "updatedAt" | "status"> & {
+export type CreateCultureRecord = Omit<CultureRecord, "id" | "createdAt" | "updatedAt" | "status"> & {
   status?: CultureStatus;
 };
 
@@ -74,25 +74,41 @@ export async function getApprovedCultureRecordBySlug(slug: string): Promise<Cult
 
 /** Intended for future owner import and approved moderation workflows. No seed data is created automatically. */
 export async function upsertCultureRecord(record: CreateCultureRecord): Promise<CultureRecord> {
+  const [storedRecord] = await upsertCultureRecords([record]);
+  if (!storedRecord) throw new Error("Culture record was not available after saving.");
+  return storedRecord;
+}
+
+export async function upsertCultureRecords(records: CreateCultureRecord[]): Promise<CultureRecord[]> {
+  if (!records.length) return [];
+
   const collection = await getCollection();
   const now = new Date();
-  const sourceDocument = {
-    ...record,
-    status: record.status ?? "draft",
-    searchText: toSearchText(record),
-    updatedAt: now,
-  };
-
-  await collection.updateOne(
-    { slug: record.slug },
-    {
-      $set: sourceDocument,
-      $setOnInsert: { createdAt: now },
-    },
-    { upsert: true },
+  await collection.bulkWrite(
+    records.map((record) => ({
+      updateOne: {
+        filter: { slug: record.slug },
+        update: {
+          $set: {
+            ...record,
+            status: record.status ?? "draft",
+            searchText: toSearchText(record),
+            updatedAt: now,
+          },
+          $setOnInsert: { createdAt: now },
+        },
+        upsert: true,
+      },
+    })),
+    { ordered: true },
   );
 
-  const storedRecord = await collection.findOne({ slug: record.slug });
-  if (!storedRecord) throw new Error("Culture record was not available after saving.");
-  return toCultureRecord(storedRecord);
+  const storedRecords = await collection.find({ slug: { $in: records.map((record) => record.slug) } }).toArray();
+  const recordsBySlug = new Map(storedRecords.map((record) => [record.slug, toCultureRecord(record)]));
+
+  return records.map((record) => {
+    const storedRecord = recordsBySlug.get(record.slug);
+    if (!storedRecord) throw new Error(`Culture record was not available after saving: ${record.slug}`);
+    return storedRecord;
+  });
 }

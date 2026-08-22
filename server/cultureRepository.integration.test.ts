@@ -1,10 +1,10 @@
 import { afterAll, describe, expect, it } from "vitest";
-import { getCultureDb, closeMongoClientForTests } from "./mongodb";
+import { getCultureDb, closeMongoClient } from "./mongodb";
 import { listApprovedCultureRecords } from "./cultureRepository";
 
 describe("cultural-record storage", () => {
   afterAll(async () => {
-    await closeMongoClientForTests();
+    await closeMongoClient();
   });
 
   it("initializes the cultural-record indexes and reads approved records without inserting test data", async () => {
