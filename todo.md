@@ -15,3 +15,5 @@
 - [x] Interactively verify mobile search, category and region filters, record selection, and panel dismissal.
 - [x] Run an isolated 375px interaction flow for search, category and region filters, record selection, and panel dismissal.
 - [x] Verify in a live 375px viewport that searching for Pongal narrows the result set successfully.
+- [ ] Confirm the GitHub repository connection and push the verified project changes.
+- [ ] Create the private india-culture-explorer GitHub repository and push the project baseline.
