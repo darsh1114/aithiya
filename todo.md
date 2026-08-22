@@ -17,3 +17,6 @@
 - [x] Verify in a live 375px viewport that searching for Pongal narrows the result set successfully.
 - [x] Confirm the GitHub repository connection and push the verified project changes.
 - [x] Create the private india-culture-explorer GitHub repository and push the project baseline.
+- [x] Configure Vercel to build and serve the Vite frontend instead of raw server TypeScript.
+- [x] Add Vercel-compatible API routing for the backend contract or document the required hosted-backend boundary.
+- [x] Validate the Vercel build output and deployment configuration.
