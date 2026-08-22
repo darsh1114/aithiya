@@ -21,6 +21,8 @@
 - [x] Add Vercel-compatible API routing for the backend contract or document the required hosted-backend boundary.
 - [x] Validate the Vercel build output and deployment configuration.
 - [x] Verify the committed Vercel output directory and push a fresh configuration commit to GitHub.
-- [ ] Push the Vercel configuration, API function, shared app, build scripts, documentation, and tests to github/main.
-- [ ] Confirm github/main contains vercel.json with outputDirectory set to dist/public.
+- [x] Push the Vercel configuration, API function, shared app, build scripts, documentation, and tests to github/main.
+- [x] Confirm github/main contains vercel.json with outputDirectory set to dist/public.
 - [ ] Confirm Vercel starts a fresh deployment from the pushed configuration commit.
+- [x] Update the GitHub remote to the reported moved repository and verify the Vercel configuration commit is present there.
+- [x] Verify the expected Vercel configuration commit hash is present on the moved repository main branch.
