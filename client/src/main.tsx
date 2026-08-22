@@ -8,6 +8,19 @@ import App from "./App";
 import { startLogin } from "./const";
 import "./index.css";
 
+// Analytics is optional. Loading it here avoids unresolved HTML placeholders
+// when this project is deployed outside the Manus environment.
+const analyticsEndpoint = import.meta.env.VITE_ANALYTICS_ENDPOINT;
+const analyticsWebsiteId = import.meta.env.VITE_ANALYTICS_WEBSITE_ID;
+
+if (analyticsEndpoint && analyticsWebsiteId) {
+  const analyticsScript = document.createElement("script");
+  analyticsScript.defer = true;
+  analyticsScript.src = `${analyticsEndpoint.replace(/\/$/, "")}/umami`;
+  analyticsScript.dataset.websiteId = analyticsWebsiteId;
+  document.head.appendChild(analyticsScript);
+}
+
 const queryClient = new QueryClient();
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {

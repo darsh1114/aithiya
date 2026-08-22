@@ -36,7 +36,8 @@ server/
 ├── cultureImport.ts               # Validate → import the pilot dataset
 └── mongodb.ts                     # Safe cached MongoDB Atlas connection
 
-api/[...path].ts                  # Vercel serverless wrapper for the Express app
+server/vercelHandler.ts            # Source for the Vercel serverless wrapper
+api/[...path].js                   # Generated during the Vercel build; not committed
 ```
 
 The `server/_core/` folder is framework infrastructure. It is normally left alone; application features belong in the files listed above.

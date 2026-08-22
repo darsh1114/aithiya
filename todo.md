@@ -29,3 +29,9 @@
 - [x] Add a README explaining setup, architecture, data flow, and project features.
 - [x] Add a concise technology-stack reference file for presentation use.
 - [x] Verify the expected Vercel configuration commit hash is present on the moved repository main branch.
+- [x] Diagnose and fix the Vercel serverless TypeScript build failure shown in deployment logs.
+- [x] Ensure Vercel can build the API function with the correct Express, MongoDB, and type dependencies.
+- [x] Document and validate the Vercel MongoDB Atlas environment-variable requirement.
+- [ ] Push the Vercel serverless build fix to GitHub main.
+- [ ] Verify Vercel has MONGODB_URI configured and Atlas permits the function's network access.
+- [ ] Test the live Vercel culture API after deployment to confirm MongoDB Atlas records load.
