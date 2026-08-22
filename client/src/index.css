@@ -119,6 +119,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -134,6 +136,40 @@
 }
 
 @layer components {
+  .culture-marker {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    border-radius: 999px;
+    background: #15342b;
+    color: #f4c968;
+    box-shadow: 0 8px 18px rgba(21, 52, 43, 0.32);
+    font-family: Georgia, serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), background-color 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .culture-marker:hover,
+  .culture-marker.is-selected {
+    background: #b9602c;
+    color: #fff8ec;
+    transform: scale(1.18);
+  }
+
+  .culture-marker:focus-visible {
+    outline: 3px solid #f4c968;
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .culture-marker {
+      transition: none;
+    }
+  }
+
   /**
    * Custom container utility that centers content and adds responsive padding.
    *

@@ -76,7 +76,7 @@
 
 /// <reference types="@types/google.maps" />
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePersistFn } from "@/hooks/usePersistFn";
 import { cn } from "@/lib/utils";
 
@@ -92,21 +92,37 @@ const FORGE_BASE_URL =
   "https://forge.butterfly-effect.dev";
 const MAPS_PROXY_URL = `${FORGE_BASE_URL}/v1/maps/proxy`;
 
-function loadMapScript() {
-  return new Promise(resolve => {
+let mapsScriptPromise: Promise<void> | null = null;
+
+function loadMapScript(): Promise<void> {
+  if (window.google?.maps) return Promise.resolve();
+  if (mapsScriptPromise) return mapsScriptPromise;
+
+  mapsScriptPromise = new Promise((resolve, reject) => {
     const script = document.createElement("script");
+    script.dataset.cultureMapsLoader = "true";
     script.src = `${MAPS_PROXY_URL}/maps/api/js?key=${API_KEY}&v=weekly&libraries=marker,places,geocoding,geometry`;
     script.async = true;
     script.crossOrigin = "anonymous";
     script.onload = () => {
-      resolve(null);
-      script.remove(); // Clean up immediately
+      if (window.google?.maps) {
+        resolve();
+        script.remove();
+        return;
+      }
+      mapsScriptPromise = null;
+      script.remove();
+      reject(new Error("Google Maps loaded without the Maps API."));
     };
     script.onerror = () => {
-      console.error("Failed to load Google Maps script");
+      mapsScriptPromise = null;
+      script.remove();
+      reject(new Error("Failed to load Google Maps."));
     };
     document.head.appendChild(script);
   });
+
+  return mapsScriptPromise;
 }
 
 interface MapViewProps {
@@ -124,24 +140,29 @@ export function MapView({
 }: MapViewProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<google.maps.Map | null>(null);
+  const [loadError, setLoadError] = useState(false);
 
   const init = usePersistFn(async () => {
-    await loadMapScript();
-    if (!mapContainer.current) {
-      console.error("Map container not found");
-      return;
-    }
-    map.current = new window.google.maps.Map(mapContainer.current, {
-      zoom: initialZoom,
-      center: initialCenter,
-      mapTypeControl: true,
-      fullscreenControl: true,
-      zoomControl: true,
-      streetViewControl: true,
-      mapId: "DEMO_MAP_ID",
-    });
-    if (onMapReady) {
-      onMapReady(map.current);
+    try {
+      await loadMapScript();
+      if (!mapContainer.current || !window.google?.maps) {
+        throw new Error("Map container or Google Maps API was not available.");
+      }
+      map.current = new window.google.maps.Map(mapContainer.current, {
+        zoom: initialZoom,
+        center: initialCenter,
+        mapTypeControl: true,
+        fullscreenControl: true,
+        zoomControl: true,
+        streetViewControl: true,
+        mapId: "DEMO_MAP_ID",
+      });
+      if (onMapReady) {
+        onMapReady(map.current);
+      }
+    } catch (error) {
+      console.error("Failed to load Google Maps", error);
+      setLoadError(true);
     }
   });
 
@@ -150,6 +171,26 @@ export function MapView({
   }, [init]);
 
   return (
-    <div ref={mapContainer} className={cn("w-full h-[500px]", className)} />
+    <div className={cn("relative w-full h-[500px]", className)} aria-busy={!loadError && !map.current}>
+      <div ref={mapContainer} className="h-full w-full" />
+      {loadError ? (
+        <div className="absolute inset-0 grid place-items-center bg-[#edf1eb] p-6 text-center" role="status">
+          <div className="max-w-xs">
+            <p className="font-serif text-xl text-[#15342b]">Map unavailable right now</p>
+            <p className="mt-2 text-sm leading-6 text-stone-600">You can still explore every cultural record through the accessible search results alongside this panel.</p>
+            <button
+              type="button"
+              className="mt-4 rounded-full bg-[#15342b] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#204a3d]"
+              onClick={() => {
+                setLoadError(false);
+                void init();
+              }}
+            >
+              Try map again
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }
