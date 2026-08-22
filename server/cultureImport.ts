@@ -29,6 +29,7 @@ function assertCuratedRecord(record: CuratedCultureRecord): void {
   }
 }
 
+// Validate before writing so incomplete records never become public data by accident.
 export function validateCuratedCulturePilot(records = curatedCulturePilot): void {
   const slugs = new Set<string>();
   for (const record of records) {

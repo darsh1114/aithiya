@@ -27,6 +27,7 @@ function toCultureRecord(document: CultureRecordDocument): CultureRecord {
   return { id: _id.toHexString(), ...record };
 }
 
+// One helper opens the collection and creates the indexes that make lookups fast.
 async function getCollection() {
   const db = await getCultureDb();
   const collection = db.collection<CultureRecordDocument>(CULTURE_COLLECTION);
@@ -55,6 +56,7 @@ export async function listApprovedCultureRecords(input?: {
   region?: string;
   query?: string;
 }): Promise<CultureRecord[]> {
+  // Public visitors should never receive drafts or records awaiting review.
   const collection = await getCollection();
   const filter: Filter<CultureRecordDocument> = { status: "approved" };
 
@@ -84,6 +86,7 @@ export async function upsertCultureRecords(records: CreateCultureRecord[]): Prom
 
   const collection = await getCollection();
   const now = new Date();
+  // Bulk upsert means: create a record if its slug is new, otherwise update it.
   await collection.bulkWrite(
     records.map((record) => ({
       updateOne: {

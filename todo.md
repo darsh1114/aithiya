@@ -25,4 +25,7 @@
 - [x] Confirm github/main contains vercel.json with outputDirectory set to dist/public.
 - [ ] Confirm Vercel starts a fresh deployment from the pushed configuration commit.
 - [x] Update the GitHub remote to the reported moved repository and verify the Vercel configuration commit is present there.
+- [x] Organize the codebase with clear student-friendly entry points and comments.
+- [x] Add a README explaining setup, architecture, data flow, and project features.
+- [x] Add a concise technology-stack reference file for presentation use.
 - [x] Verify the expected Vercel configuration commit hash is present on the moved repository main branch.

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { ArrowUpRight, CalendarDays, ChevronRight, Compass, ExternalLink, MapPin, Search, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+// The page has one simple source of truth for the visible records: search, category, and region.
 const categories: Array<CultureCategory | "all"> = ["all", "festival", "tradition", "food", "story"];
 
 function ResultCard({ record, isSelected, onSelect }: { record: CultureRecord; isSelected: boolean; onSelect: () => void }) {
@@ -58,6 +59,7 @@ function SelectedRecord({ record, onClose }: { record: CultureRecord; onClose: (
 }
 
 export default function Home() {
+  // 1. Store what the visitor selected.
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [category, setCategory] = useState<CultureCategory | "all">("all");
@@ -70,11 +72,13 @@ export default function Home() {
     return () => window.clearTimeout(timeout);
   }, [search]);
 
+  // 2. Turn the page state into a small API filter object, then load matching records.
   const filterInput = useMemo(() => buildCultureListFilter({ search: debouncedSearch, category, region }), [category, debouncedSearch, region]);
   const recordsQuery = trpc.culture.list.useQuery(filterInput);
   const allRecords = allRecordsQuery.data ?? [];
   const records = recordsQuery.data ?? [];
   const regions = useMemo(() => uniqueRegions(allRecords), [allRecords]);
+  // 3. The map and list share selectedSlug, so either one can select the same record.
   const selectedRecord = useMemo(() => records.find((record) => record.slug === selectedSlug) ?? null, [records, selectedSlug]);
 
   useEffect(() => {

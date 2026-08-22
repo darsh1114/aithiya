@@ -9,6 +9,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 
+// Reusable route guards keep access rules in one easy-to-read place.
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (ctx.user.role !== "admin") {
     throw new TRPCError({ code: "FORBIDDEN", message: "Administrator access is required." });
@@ -37,6 +38,7 @@ export const appRouter = router({
     }),
   }),
 
+  // Public discovery routes read only approved records. Admin and owner routes are protected.
   culture: router({
     list: publicProcedure
       .input(
