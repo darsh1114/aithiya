@@ -32,3 +32,9 @@
 - [x] Confirm whether the latest student-friendly documentation checkpoint is present on GitHub main.
 - [x] Push the student-friendly documentation checkpoint to github/main.
 - [x] Confirm github/main matches the latest student-friendly documentation checkpoint after the push.
+- [x] Diagnose and fix the Vercel serverless TypeScript build failure shown in deployment logs.
+- [x] Ensure Vercel can build the API function with the correct Express, MongoDB, and type dependencies.
+- [x] Document and validate the Vercel MongoDB Atlas environment-variable requirement.
+- [ ] Push the Vercel serverless build fix to GitHub main.
+- [ ] Verify Vercel has MONGODB_URI configured and Atlas permits the function's network access.
+- [ ] Test the live Vercel culture API after deployment to confirm MongoDB Atlas records load.
