@@ -1,9 +1,0 @@
-node_modules
-dist
-.git
-.manus-logs
-.env
-.env.*
-coverage
-npm-debug.log*
-pnpm-debug.log*

@@ -30,10 +30,6 @@ describe("createApp", () => {
     expect(app).toHaveProperty("listen");
   });
 
-  it("supports a Vercel-specific storage path without changing app creation", () => {
-    expect(() => createApp({ storagePathPrefix: "/api/manus-storage" })).not.toThrow();
-  });
-
   it("exposes a lightweight health endpoint without requiring a database call", async () => {
     await withServer(createApp(), async (origin) => {
       const response = await fetch(`${origin}/health`);

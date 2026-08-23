@@ -1,16 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "buildCommand": "pnpm build:vercel",
+  "buildCommand": "pnpm build:client",
   "outputDirectory": "dist/public",
   "rewrites": [
     {
-      "source": "/manus-storage/:path*",
-      "destination": "/api/manus-storage/:path*"
-    },
-    {
-      "source": "/((?!api(?:/|$)|manus-storage(?:/|$)).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
 }
+

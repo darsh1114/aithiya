@@ -8,8 +8,10 @@ describe("cultural-record storage", () => {
   });
 
   it("initializes the cultural-record indexes and reads approved records without inserting test data", async () => {
-    const records = await listApprovedCultureRecords();
-    expect(Array.isArray(records)).toBe(true);
+    const result = await listApprovedCultureRecords({ limit: 250 });
+    expect(Array.isArray(result.items)).toBe(true);
+    expect(result.items.length).toBeLessThanOrEqual(250);
+    expect(result.total).toBeGreaterThanOrEqual(result.items.length);
 
     const db = await getCultureDb();
     const indexes = await db.collection("cultureRecords").indexes();

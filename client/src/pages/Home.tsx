@@ -11,6 +11,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 // The page has one simple source of truth for the visible records: search, category, and region.
 const categories: Array<CultureCategory | "all"> = ["all", "festival", "tradition", "food", "story"];
 
+function unpackCultureList(data: CultureRecord[] | { items: CultureRecord[]; total: number } | undefined) {
+  return Array.isArray(data) ? { items: data, total: data.length } : data ?? { items: [], total: 0 };
+}
+
 function ResultCard({ record, isSelected, onSelect }: { record: CultureRecord; isSelected: boolean; onSelect: () => void }) {
   const category = categoryPresentation[record.category];
 
@@ -65,7 +69,8 @@ export default function Home() {
   const [category, setCategory] = useState<CultureCategory | "all">("all");
   const [region, setRegion] = useState("all");
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
-  const allRecordsQuery = trpc.culture.list.useQuery();
+  const [visibleLimit, setVisibleLimit] = useState(24);
+  const allRecordsQuery = trpc.culture.list.useQuery({ limit: 250 });
 
   useEffect(() => {
     const timeout = window.setTimeout(() => setDebouncedSearch(search.trim()), 220);
@@ -73,11 +78,14 @@ export default function Home() {
   }, [search]);
 
   // 2. Turn the page state into a small API filter object, then load matching records.
-  const filterInput = useMemo(() => buildCultureListFilter({ search: debouncedSearch, category, region }), [category, debouncedSearch, region]);
+  const filterInput = useMemo(() => ({ ...buildCultureListFilter({ search: debouncedSearch, category, region }), limit: 250 }), [category, debouncedSearch, region]);
   const recordsQuery = trpc.culture.list.useQuery(filterInput);
-  const allRecords = allRecordsQuery.data ?? [];
-  const records = recordsQuery.data ?? [];
+  const allRecordResult = unpackCultureList(allRecordsQuery.data);
+  const recordResult = unpackCultureList(recordsQuery.data);
+  const allRecords = allRecordResult.items;
+  const records = recordResult.items;
   const regions = useMemo(() => uniqueRegions(allRecords), [allRecords]);
+  const visibleRecords = useMemo(() => records.slice(0, visibleLimit), [records, visibleLimit]);
   // 3. The map and list share selectedSlug, so either one can select the same record.
   const selectedRecord = useMemo(() => records.find((record) => record.slug === selectedSlug) ?? null, [records, selectedSlug]);
 
@@ -90,11 +98,12 @@ export default function Home() {
     setCategory("all");
     setRegion("all");
     setSelectedSlug(null);
+    setVisibleLimit(24);
   }, []);
 
   const isFiltering = Boolean(search) || category !== "all" || region !== "all";
-  const recordCount = allRecords.length || 22;
-  const regionCount = regions.length || 6;
+  const recordCount = allRecordResult.total;
+  const regionCount = regions.length;
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#f7f5ee] text-[#25322c]">
@@ -143,7 +152,7 @@ export default function Home() {
 
           <div>
             <div className="mb-4 flex items-end justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#b9602c]">Search results</p><h2 className="mt-1 font-serif text-3xl text-[#15342b]">{recordsQuery.isLoading ? "Finding records…" : `${records.length} cultural ${records.length === 1 ? "record" : "records"}`}</h2></div><span className="hidden text-sm text-stone-500 sm:block">Map and list stay in sync</span></div>
-            {recordsQuery.isLoading ? <div className="grid gap-3">{Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-36 animate-pulse rounded-2xl border border-stone-200 bg-white" />)}</div> : recordsQuery.isError ? <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-rose-800"><strong>We couldn’t load cultural records.</strong><p className="mt-1 text-sm">Please refresh the page to try again.</p></div> : records.length ? <div className="grid gap-3">{records.map((record) => <ResultCard key={record.id} record={record} isSelected={record.slug === selectedSlug} onSelect={() => setSelectedSlug(record.slug)} />)}</div> : <div className="rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-12 text-center"><Compass className="mx-auto h-7 w-7 text-[#b9602c]" /><h3 className="mt-4 font-serif text-2xl text-[#15342b]">No records match yet</h3><p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-stone-500">Try a different place, practice, or category—or return to the full cultural atlas.</p><Button onClick={clearFilters} className="mt-5 bg-[#15342b] text-white hover:bg-[#204a3d]"><ArrowUpRight className="mr-2 h-4 w-4" />Show all records</Button></div>}
+            {recordsQuery.isLoading ? <div className="grid gap-3">{Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-36 animate-pulse rounded-2xl border border-stone-200 bg-white" />)}</div> : recordsQuery.isError ? <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-rose-800"><strong>We couldn’t load cultural records.</strong><p className="mt-1 text-sm">Check the Render connection, then refresh this page.</p></div> : records.length ? <><div className="grid gap-3">{visibleRecords.map((record) => <ResultCard key={record.id} record={record} isSelected={record.slug === selectedSlug} onSelect={() => setSelectedSlug(record.slug)} />)}</div>{visibleRecords.length < records.length ? <Button variant="outline" className="mt-4 w-full border-[#15342b]/20 text-[#15342b]" onClick={() => setVisibleLimit((current) => current + 24)}>Load more records ({records.length - visibleRecords.length} remaining)</Button> : null}</> : <div className="rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-12 text-center"><Compass className="mx-auto h-7 w-7 text-[#b9602c]" /><h3 className="mt-4 font-serif text-2xl text-[#15342b]">No records match yet</h3><p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-stone-500">Try a different place, practice, or category—or return to the full cultural atlas.</p><Button onClick={clearFilters} className="mt-5 bg-[#15342b] text-white hover:bg-[#204a3d]"><ArrowUpRight className="mr-2 h-4 w-4" />Show all records</Button></div>}
           </div>
         </section>
       </main>

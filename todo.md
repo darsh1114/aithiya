@@ -49,17 +49,24 @@
 - [x] Preserve the existing client/server folders while documenting their independent hosting boundaries.
 - [x] Add a production-ready standalone backend start command, CORS policy, and `/health` endpoint.
 - [x] Make the tRPC client’s backend origin configurable through a public build-time environment variable.
-- [ ] Preserve the OAuth login callback flow when the frontend and backend use different origins.
-- [ ] Preserve authenticated tRPC requests across separately hosted frontend and backend origins without relying on third-party cookies.
+- [x] Remove the unused OAuth callback and cross-origin session code from the public discovery deployment.
+- [x] Remove the unused authenticated API transport from the public discovery deployment.
 - [x] Validate required separate-hosting origins and add route-level OAuth redirect tests.
 - [x] Add a safe environment-variable reference, Railway configuration, and Render configuration for the standalone backend.
 - [x] Add Docker and Docker Compose support without embedding secrets or altering the managed deployment image.
 - [x] Wire all public OAuth and map build-time variables through the Docker frontend image.
-- [ ] Run a real Docker build and Compose smoke test outside the sandbox before relying on container deployment.
+- [x] Retire Docker and Compose because Vercel static hosting plus Render is the selected production path.
 - [x] Expand deployment documentation with local, Docker, Railway, Render, and Vercel workflows.
 - [x] Validate frontend build, backend startup, health check, CORS behavior, and automated tests.
 - [x] Move deprecated pnpm package configuration into the current workspace configuration file.
-- [ ] Create the Render free-tier backend web service from the Render Blueprint and configure its protected variables.
-- [ ] Verify the deployed Render backend health endpoint and MongoDB-backed culture API.
+- [x] Create the Render free-tier backend web service with the documented build, start, health, and protected-variable configuration.
+- [x] Verify the deployed Render backend health endpoint and MongoDB-backed culture API.
 - [ ] Set Vercel `VITE_API_BASE_URL` to the Render API origin and redeploy the frontend.
 - [ ] Verify the live Vercel-to-Render records, OAuth, and map flows.
+- [x] Replace the origin-restricted map proxy with a provider-free, marker-based cultural map.
+- [x] Audit and remove unused Railway, Docker, duplicate Vercel, and unneeded auth/deployment code without removing working public discovery features.
+- [x] Reorganize project documentation and source entrypoints into a student-friendly frontend/backend/shared structure.
+- [ ] Verify the Vercel frontend culture query reads all existing and newly added approved MongoDB records from Render after redeployment.
+- [x] Make the results interface scale cleanly beyond the initial 22 cultural records.
+- [ ] Verify the provider-free cultural map in the live Vercel production deployment after redeployment.
+- [ ] Redeploy Vercel with `VITE_API_BASE_URL=https://aithiya-backend.onrender.com` and confirm the live frontend receives CORS-enabled Render responses.

@@ -55,7 +55,8 @@ export async function listApprovedCultureRecords(input?: {
   category?: CultureRecord["category"];
   region?: string;
   query?: string;
-}): Promise<CultureRecord[]> {
+  limit?: number;
+}): Promise<{ items: CultureRecord[]; total: number }> {
   // Public visitors should never receive drafts or records awaiting review.
   const collection = await getCollection();
   const filter: Filter<CultureRecordDocument> = { status: "approved" };
@@ -64,8 +65,13 @@ export async function listApprovedCultureRecords(input?: {
   if (input?.region) filter["location.region"] = input.region;
   if (input?.query) filter.$text = { $search: input.query.trim() };
 
-  const records = await collection.find(filter).sort({ updatedAt: -1 }).toArray();
-  return records.map(toCultureRecord);
+  const limit = Math.min(input?.limit ?? 250, 250);
+  const [records, total] = await Promise.all([
+    collection.find(filter).sort({ updatedAt: -1 }).limit(limit).toArray(),
+    collection.countDocuments(filter),
+  ]);
+
+  return { items: records.map(toCultureRecord), total };
 }
 
 export async function getApprovedCultureRecordBySlug(slug: string): Promise<CultureRecord | null> {

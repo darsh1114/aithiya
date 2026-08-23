@@ -1,44 +1,11 @@
-import { COOKIE_NAME } from "@shared/const";
-import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { cultureCategories } from "../shared/culture";
-import { importCuratedCulturePilot } from "./cultureImport";
-import { getApprovedCultureRecordBySlug, listApprovedCultureRecords } from "./cultureRepository";
-import { ENV } from "./_core/env";
-import { getSessionCookieOptions } from "./_core/cookies";
-import { systemRouter } from "./_core/systemRouter";
-import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
-
-// Reusable route guards keep access rules in one easy-to-read place.
-const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (ctx.user.role !== "admin") {
-    throw new TRPCError({ code: "FORBIDDEN", message: "Administrator access is required." });
-  }
-  return next({ ctx });
-});
-
-const ownerProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (!ENV.ownerOpenId || ctx.user.openId !== ENV.ownerOpenId) {
-    throw new TRPCError({ code: "FORBIDDEN", message: "Owner access is required." });
-  }
-  return next({ ctx });
-});
+import { listApprovedCultureRecords } from "./cultureRepository";
+import { publicProcedure, router } from "./trpc";
 
 export const appRouter = router({
-    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
-  system: systemRouter,
-  auth: router({
-    me: publicProcedure.query(opts => opts.ctx.user),
-    logout: publicProcedure.mutation(({ ctx }) => {
-      const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
-      return {
-        success: true,
-      } as const;
-    }),
-  }),
-
-  // Public discovery routes read only approved records. Admin and owner routes are protected.
+  // Visitors can browse approved records only. New entries are added directly
+  // to MongoDB Atlas, then appear here without a code deployment.
   culture: router({
     list: publicProcedure
       .input(
@@ -47,25 +14,12 @@ export const appRouter = router({
             category: z.enum(cultureCategories).optional(),
             region: z.string().trim().min(1).max(80).optional(),
             query: z.string().trim().min(1).max(120).optional(),
+            limit: z.number().int().min(1).max(250).optional(),
           })
           .optional(),
       )
       .query(({ input }) => listApprovedCultureRecords(input)),
-    bySlug: publicProcedure
-      .input(z.object({ slug: z.string().trim().min(1).max(160) }))
-      .query(async ({ input }) => {
-        const record = await getApprovedCultureRecordBySlug(input.slug);
-        if (!record) throw new TRPCError({ code: "NOT_FOUND", message: "Culture record not found." });
-        return record;
-      }),
-    connectionStatus: adminProcedure.query(async () => {
-      const { pingCultureDatabase } = await import("./mongodb");
-      const { database } = await pingCultureDatabase();
-      return { connected: true, database };
-    }),
-    importCuratedPilot: ownerProcedure.mutation(() => importCuratedCulturePilot()),
   }),
-
 });
 
 export type AppRouter = typeof appRouter;

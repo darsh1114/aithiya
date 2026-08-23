@@ -14,11 +14,3 @@ export function getApiBaseUrl(configuredUrl = import.meta.env.VITE_API_BASE_URL,
 export function getTrpcUrl(configuredUrl = import.meta.env.VITE_API_BASE_URL, currentOrigin = window.location.origin): string {
   return `${getApiBaseUrl(configuredUrl, currentOrigin)}/api/trpc`;
 }
-
-export function usesExternalApi(configuredUrl = import.meta.env.VITE_API_BASE_URL, currentOrigin = window.location.origin): boolean {
-  return getApiBaseUrl(configuredUrl, currentOrigin) !== currentOrigin;
-}
-
-export function getSessionTokenFromHash(hash: string): string | null {
-  return new URLSearchParams(hash.replace(/^#/, "")).get("manus_session");
-}
