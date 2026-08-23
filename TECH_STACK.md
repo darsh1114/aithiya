@@ -6,16 +6,14 @@
 |---|---|---|
 | Language | TypeScript | Makes data shapes and API calls easier to understand and safer to change. |
 | Frontend | React 19 + Vite | Builds the fast, interactive map and search interface. |
-| Styling | Tailwind CSS 4 + shadcn/ui | Creates consistent responsive components with less custom CSS. |
-| Interaction | Framer Motion + Lucide icons | Adds small visual feedback and clear interface icons. |
-| Charts | Recharts | Available for seasonality and culture-data visualizations. |
+| Styling | Tailwind CSS 4 | Creates a consistent responsive interface with minimal custom CSS. |
+| Interaction | Lucide icons | Adds familiar, lightweight interface icons. |
 | API | tRPC 11 + Express 4 | Provides typed frontend-to-backend calls in one TypeScript project. |
-| Identity | Manus OAuth + Drizzle/MySQL | Keeps sign-in users and roles separate from cultural content. |
-| Content database | MongoDB Atlas | Stores nested cultural records, locations, sources, imports, and moderation data. |
-| Map | Google Maps JavaScript API | Shows cultural records by geographic location. |
-| Testing | Vitest | Checks filter helpers, imports, database access, and API setup. |
+| Content database | MongoDB Atlas | Stores nested cultural records, locations, sources, and approval status. |
+| Map | Built-in cultural atlas | Draws an India-focused map with record markers from stored coordinates. |
+| Testing | Vitest | Checks filters, API setup, deployment configuration, and MongoDB access. |
 | Build | pnpm, Vite, esbuild | Installs packages and creates frontend/server production builds. |
-| Deployment | Manus hosting or Vercel | Supports managed project hosting or a Vite static frontend plus serverless API. |
+| Deployment | Vercel + Render | Vercel hosts the static frontend; Render hosts the public API. |
 
 ## Five technologies to remember
 
@@ -23,7 +21,7 @@
 2. **TypeScript** — safer code and shared data types.
 3. **tRPC + Express** — backend API.
 4. **MongoDB Atlas** — cultural-record database.
-5. **Google Maps** — location-based discovery.
+5. **Built-in cultural atlas** — location-based discovery without a browser map key.
 
 ## References
 
@@ -32,4 +30,3 @@
 [3]: https://trpc.io/docs "tRPC documentation"
 [4]: https://expressjs.com/ "Express documentation"
 [5]: https://www.mongodb.com/docs/atlas/ "MongoDB Atlas documentation"
-[6]: https://developers.google.com/maps/documentation/javascript "Google Maps JavaScript API documentation"

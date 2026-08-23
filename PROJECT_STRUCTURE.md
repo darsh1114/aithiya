@@ -9,6 +9,7 @@ client/                 React + Vite frontend (Vercel)
   src/lib/apiUrl.ts     Render API address helper
 
 server/                 Express + tRPC API (Render)
+  index.ts              Small server entrypoint for Render and managed hosting
   app.ts                CORS, /health, and /api/trpc
   routers.ts            Public culture.list procedure
   cultureRepository.ts  MongoDB Atlas query and indexes
@@ -16,6 +17,7 @@ server/                 Express + tRPC API (Render)
 
 shared/                 CultureRecord type and category definitions
 
+docs/                   Research notes kept out of the source root
 render.yaml             Free-tier Render backend settings
 vercel.json             Static Vercel frontend settings
 ```

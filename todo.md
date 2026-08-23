@@ -70,3 +70,7 @@
 - [x] Make the results interface scale cleanly beyond the initial 22 cultural records.
 - [ ] Verify the provider-free cultural map in the live Vercel production deployment after redeployment.
 - [ ] Redeploy Vercel with `VITE_API_BASE_URL=https://aithiya-backend.onrender.com` and confirm the live frontend receives CORS-enabled Render responses.
+- [x] Remove remaining unused root artifacts such as legacy patch, script, generated-output, and template configuration files.
+- [x] Remove the unused cultural-pilot, legacy Google Maps verification, shared error, and empty public-folder files.
+- [x] Restore the unified `dist/index.js` startup output used by both the managed host and Render API.
+- [ ] Verify the managed deployment starts after the clean-structure update.
