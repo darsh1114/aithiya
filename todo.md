@@ -77,8 +77,8 @@
 - [x] Update deployment guidance to the confirmed Vercel origin `https://aithiyaa-legacy-trackers.vercel.app`.
 - [x] Verify the live Render `FRONTEND_URL` allows `https://aithiyaa-legacy-trackers.vercel.app` and returns the expected CORS response.
 - [x] Allow managed startup without FRONTEND_URL while keeping Render CORS restricted when the variable is configured.
-- [x] Add a validated `build:backend` compatibility alias for the stale Render service command.
-- [ ] Redeploy the Render service with the compatible build command and verify the live API starts successfully.
+- [x] Remove the redundant legacy Render command aliases now that the service uses the current build and start commands.
+- [x] Keep the corrected Render `build:api` and `start` settings as the only production deployment commands.
 - [x] Confirm the application serves approved cultural records through public procedures with no login route or session gate.
 - [x] Document that authentication is reserved for future cultural-data submission and moderation actions, not public browsing.
 - [x] Disable Vercel Deployment Protection for the production domain and verify anonymous public viewing.
