@@ -29,9 +29,20 @@
 - [x] Add a README explaining setup, architecture, data flow, and project features.
 - [x] Add a concise technology-stack reference file for presentation use.
 - [x] Verify the expected Vercel configuration commit hash is present on the moved repository main branch.
+- [x] Confirm whether the latest student-friendly documentation checkpoint is present on GitHub main.
+- [x] Push the student-friendly documentation checkpoint to github/main.
+- [x] Confirm github/main matches the latest student-friendly documentation checkpoint after the push.
 - [x] Diagnose and fix the Vercel serverless TypeScript build failure shown in deployment logs.
 - [x] Ensure Vercel can build the API function with the correct Express, MongoDB, and type dependencies.
 - [x] Document and validate the Vercel MongoDB Atlas environment-variable requirement.
-- [ ] Push the Vercel serverless build fix to GitHub main.
+- [x] Push the Vercel serverless build fix to GitHub main.
 - [ ] Verify Vercel has MONGODB_URI configured and Atlas permits the function's network access.
 - [ ] Test the live Vercel culture API after deployment to confirm MongoDB Atlas records load.
+- [ ] Diagnose the Vercel production API response for missing cultural records.
+- [ ] Verify the Vercel production environment has all required MongoDB and map-service variables.
+- [ ] Verify the live map loads after cultural records are restored.
+- [x] Reassess the masked Vercel MONGODB_URI and confirm it must not be interpreted as a placeholder from the screenshot.
+- [ ] Collect the production Vercel Function log and identify the actual culture API failure mode.
+- [x] Commit the generated Vercel catch-all JavaScript handler so the API function exists in the Git checkout.
+- [x] Update README language to identify the checked-in Vercel function artifact.
+- [x] Push the committed handler to github/main and confirm the canonical branch contains it.

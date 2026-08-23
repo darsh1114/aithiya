@@ -1,6 +1,6 @@
 # Vercel deployment
 
-This project has two deployment surfaces. Vercel builds the React/Vite client as static files from `dist/public`, while the build process bundles `server/vercelHandler.ts` into `api/[...path].js` for `/api/trpc` and `/api/oauth/callback`. The configuration intentionally does **not** run `server/_core/index.ts` on Vercel because that file binds a long-lived Node listener for the Manus runtime.
+This project has two deployment surfaces. Vercel builds the React/Vite client as static files from `dist/public`, while the build process bundles `server/vercelHandler.ts` into the checked-in `api/[...path].js` entrypoint for `/api/trpc` and `/api/oauth/callback`. The entrypoint is versioned so Vercel can discover the API function from the Git checkout before it runs the build command. The configuration intentionally does **not** run `server/_core/index.ts` on Vercel because that file binds a long-lived Node listener for the Manus runtime.
 
 ## Vercel project settings
 
@@ -24,4 +24,4 @@ The existing OAuth and storage code uses Manus-provided services. For a Vercel p
 
 ## Validation
 
-Run `pnpm build:vercel` locally. It creates the Vite frontend in `dist/public` and bundles the serverless function to `api/[...path].js`. Vercel executes that JavaScript entrypoint directly, avoiding a second TypeScript compilation of the shared Express/tRPC server tree.
+Run `pnpm build:vercel` locally. It creates the Vite frontend in `dist/public` and refreshes the versioned serverless function source at `api/[...path].js`. Commit that refreshed file with any changes to `server/vercelHandler.ts` or its server-side dependencies. This lets Vercel use the JavaScript function entrypoint without separately compiling the shared Express/tRPC TypeScript tree.
