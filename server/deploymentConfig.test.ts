@@ -7,11 +7,8 @@ describe("deployment configuration", () => {
     expect(getConfiguredFrontendOrigins("https://one.example/, https://two.example")).toEqual(["https://one.example", "https://two.example"]);
   });
 
-  it("requires FRONTEND_URL when the public API starts in production", () => {
-    const originalEnvironment = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
-    expect(() => validateStandaloneOriginConfiguration("")).toThrow("Set FRONTEND_URL");
+  it("allows the managed API to start without a CORS allowlist", () => {
+    expect(() => validateStandaloneOriginConfiguration("")).not.toThrow();
     expect(() => validateStandaloneOriginConfiguration("https://explorer.example")).not.toThrow();
-    process.env.NODE_ENV = originalEnvironment;
   });
 });

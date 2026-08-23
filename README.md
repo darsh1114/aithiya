@@ -10,7 +10,7 @@ India Culture Explorer is a public map-first website for discovering Indian fest
 | Backend | Express + tRPC on Render | Provides the public culture API and health check. |
 | Database | MongoDB Atlas | Stores every cultural record. |
 
-The Vercel frontend uses `VITE_API_BASE_URL=https://aithiya-backend.onrender.com`. The Render backend uses `MONGODB_URI` and `FRONTEND_URL=https://aithiyaa-miattlpvp-legacy-trackers.vercel.app`.
+The Vercel frontend uses `VITE_API_BASE_URL=https://aithiya-backend.onrender.com`. The Render backend uses `MONGODB_URI` and `FRONTEND_URL=https://aithiyaa-legacy-trackers.vercel.app`.
 
 ## Commands
 

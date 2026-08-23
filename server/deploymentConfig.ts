@@ -7,7 +7,10 @@ export function getConfiguredFrontendOrigins(value = process.env.FRONTEND_URL ??
 }
 
 export function validateStandaloneOriginConfiguration(frontendUrl = process.env.FRONTEND_URL ?? ""): void {
-  if (process.env.NODE_ENV === "production" && !frontendUrl.trim()) {
-    throw new Error("Set FRONTEND_URL to the Vercel frontend origin before starting the production API.");
+  // FRONTEND_URL is required by Render for browser CORS, but the managed
+  // project preview can run without it because it does not serve the Vercel UI.
+  // An empty value therefore starts the API with no cross-origin allowlist.
+  if (frontendUrl && getConfiguredFrontendOrigins(frontendUrl).length === 0) {
+    throw new Error("FRONTEND_URL must contain at least one valid origin.");
   }
 }

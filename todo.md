@@ -74,3 +74,6 @@
 - [x] Remove the unused cultural-pilot, legacy Google Maps verification, shared error, and empty public-folder files.
 - [x] Restore the unified `dist/index.js` startup output used by both the managed host and Render API.
 - [ ] Verify the managed deployment starts after the clean-structure update.
+- [x] Update deployment guidance to the confirmed Vercel origin `https://aithiyaa-legacy-trackers.vercel.app`.
+- [ ] Set the live Render `FRONTEND_URL` to `https://aithiyaa-legacy-trackers.vercel.app`, redeploy, and verify its CORS response.
+- [x] Allow managed startup without FRONTEND_URL while keeping Render CORS restricted when the variable is configured.

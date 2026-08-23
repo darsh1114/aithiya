@@ -30,4 +30,4 @@ Vercel frontend → Render /api/trpc/culture.list → MongoDB Atlas → approved
 
 New MongoDB records appear automatically when their `status` is `approved` and they contain the required culture fields. The API returns up to 250 records per filter, and the browser shows 24 cards at a time with a **Load more** control.
 
-The cultural map is now a built-in, marker-based India view. It uses each record’s MongoDB longitude/latitude and has no Google Maps key, Forge proxy, or external-origin approval requirement. Render must still set `FRONTEND_URL` to the exact Vercel origin so browser requests receive the required CORS header.
+The cultural map is now a built-in, marker-based India view. It uses each record’s MongoDB longitude/latitude and has no Google Maps key, Forge proxy, or external-origin approval requirement. Render must set `FRONTEND_URL=https://aithiyaa-legacy-trackers.vercel.app` so browser requests receive the required CORS header.
