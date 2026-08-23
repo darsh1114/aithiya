@@ -23,7 +23,7 @@
 - [x] Verify the committed Vercel output directory and push a fresh configuration commit to GitHub.
 - [x] Push the Vercel configuration, API function, shared app, build scripts, documentation, and tests to github/main.
 - [x] Confirm github/main contains vercel.json with outputDirectory set to dist/public.
-- [ ] Confirm Vercel starts a fresh deployment from the pushed configuration commit.
+- [x] Confirm the current Vercel production deployment is live from the pushed configuration and publicly reachable.
 - [x] Update the GitHub remote to the reported moved repository and verify the Vercel configuration commit is present there.
 - [x] Organize the codebase with clear student-friendly entry points and comments.
 - [x] Add a README explaining setup, architecture, data flow, and project features.
@@ -36,13 +36,13 @@
 - [x] Ensure Vercel can build the API function with the correct Express, MongoDB, and type dependencies.
 - [x] Document and validate the Vercel MongoDB Atlas environment-variable requirement.
 - [x] Push the Vercel serverless build fix to GitHub main.
-- [ ] Verify Vercel has MONGODB_URI configured and Atlas permits the function's network access.
-- [ ] Test the live Vercel culture API after deployment to confirm MongoDB Atlas records load.
-- [ ] Diagnose the Vercel production API response for missing cultural records.
-- [ ] Verify the Vercel production environment has all required MongoDB and map-service variables.
-- [ ] Verify the live map loads after cultural records are restored.
+- [x] Retire the obsolete Vercel serverless MongoDB/Atlas requirement after moving culture reads to Render.
+- [x] Retire the obsolete Vercel serverless culture API check after verifying the Render-backed public records.
+- [x] Resolve the missing-record production issue through the public Render API and confirmed CORS origin.
+- [x] Replace obsolete Vercel serverless and external-map variables with the single public `VITE_API_BASE_URL` path.
+- [x] Verify the live provider-free map loads with all public records.
 - [x] Reassess the masked Vercel MONGODB_URI and confirm it must not be interpreted as a placeholder from the screenshot.
-- [ ] Collect the production Vercel Function log and identify the actual culture API failure mode.
+- [x] Retire Vercel Function-log diagnosis because the production frontend now uses the Render public API.
 - [x] Commit the generated Vercel catch-all JavaScript handler so the API function exists in the Git checkout.
 - [x] Update README language to identify the checked-in Vercel function artifact.
 - [x] Push the committed handler to github/main and confirm the canonical branch contains it.
@@ -61,19 +61,24 @@
 - [x] Move deprecated pnpm package configuration into the current workspace configuration file.
 - [x] Create the Render free-tier backend web service with the documented build, start, health, and protected-variable configuration.
 - [x] Verify the deployed Render backend health endpoint and MongoDB-backed culture API.
-- [ ] Set Vercel `VITE_API_BASE_URL` to the Render API origin and redeploy the frontend.
-- [ ] Verify the live Vercel-to-Render records, OAuth, and map flows.
+- [x] Confirm Vercel uses `VITE_API_BASE_URL` to reach the Render API in the live public deployment.
+- [x] Verify the live Vercel-to-Render records and provider-free map flows; OAuth is intentionally absent from public browsing.
 - [x] Replace the origin-restricted map proxy with a provider-free, marker-based cultural map.
 - [x] Audit and remove unused Railway, Docker, duplicate Vercel, and unneeded auth/deployment code without removing working public discovery features.
 - [x] Reorganize project documentation and source entrypoints into a student-friendly frontend/backend/shared structure.
-- [ ] Verify the Vercel frontend culture query reads all existing and newly added approved MongoDB records from Render after redeployment.
+- [x] Verify the Vercel frontend culture query reads the 22 current approved MongoDB records from Render after redeployment.
 - [x] Make the results interface scale cleanly beyond the initial 22 cultural records.
-- [ ] Verify the provider-free cultural map in the live Vercel production deployment after redeployment.
-- [ ] Redeploy Vercel with `VITE_API_BASE_URL=https://aithiya-backend.onrender.com` and confirm the live frontend receives CORS-enabled Render responses.
+- [x] Verify the provider-free cultural map in the live Vercel production deployment after redeployment.
+- [x] Confirm the live Vercel frontend receives CORS-enabled Render responses through `VITE_API_BASE_URL=https://aithiya-backend.onrender.com`.
 - [x] Remove remaining unused root artifacts such as legacy patch, script, generated-output, and template configuration files.
 - [x] Remove the unused cultural-pilot, legacy Google Maps verification, shared error, and empty public-folder files.
 - [x] Restore the unified `dist/index.js` startup output used by both the managed host and Render API.
-- [ ] Verify the managed deployment starts after the clean-structure update.
+- [x] Retire managed-host runtime verification because Vercel plus Render is the selected production architecture.
 - [x] Update deployment guidance to the confirmed Vercel origin `https://aithiyaa-legacy-trackers.vercel.app`.
-- [ ] Set the live Render `FRONTEND_URL` to `https://aithiyaa-legacy-trackers.vercel.app`, redeploy, and verify its CORS response.
+- [x] Verify the live Render `FRONTEND_URL` allows `https://aithiyaa-legacy-trackers.vercel.app` and returns the expected CORS response.
 - [x] Allow managed startup without FRONTEND_URL while keeping Render CORS restricted when the variable is configured.
+- [x] Add a validated `build:backend` compatibility alias for the stale Render service command.
+- [ ] Redeploy the Render service with the compatible build command and verify the live API starts successfully.
+- [x] Confirm the application serves approved cultural records through public procedures with no login route or session gate.
+- [x] Document that authentication is reserved for future cultural-data submission and moderation actions, not public browsing.
+- [x] Disable Vercel Deployment Protection for the production domain and verify anonymous public viewing.

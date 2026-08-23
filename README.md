@@ -26,4 +26,10 @@ The Vercel frontend uses `VITE_API_BASE_URL=https://aithiya-backend.onrender.com
 
 Add records to the `cultureRecords` collection in the `india_culture_explorer` MongoDB database. A record appears publicly when `status` is `approved`. The public API returns up to 250 matching records and the page provides a **Load more** control, so the design can grow beyond the original 22-record pilot.
 
+## Public access policy
+
+Anyone should be able to browse the website, search approved cultural records, and use the cultural map **without signing in**. Vercel Deployment Protection must therefore leave the production website public.
+
+Authentication is intentionally reserved for a future contribution workflow: a user would sign in only to submit a festival, tradition, food, or story, while moderators would sign in to review and approve submissions before publication. The current public site has no login gate and no contribution form.
+
 Read [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) for a student-friendly file map and data flow.
