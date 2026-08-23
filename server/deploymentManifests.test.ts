@@ -22,6 +22,7 @@ describe("independent deployment manifests", () => {
     expect(railway.deploy.healthcheckPath).toBe("/health");
     expect(render).toContain("pnpm build:backend");
     expect(render).toContain("healthCheckPath: /health");
+    expect(render).toContain("plan: free");
   });
 
   it("keeps server secrets out of the frontend image while forwarding its required public settings", () => {

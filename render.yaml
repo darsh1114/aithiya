@@ -2,6 +2,7 @@ services:
   - type: web
     runtime: node
     name: india-culture-explorer-api
+    plan: free
     buildCommand: pnpm install --frozen-lockfile && pnpm build:backend
     startCommand: pnpm start:backend
     healthCheckPath: /health

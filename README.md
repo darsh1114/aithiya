@@ -122,9 +122,11 @@ curl https://your-api.up.railway.app/health
 
 ## Deploy the backend to Render
 
-Render reads the root `render.yaml` Blueprint. The Blueprint defines a Node web service, custom build and start commands, `/health`, and prompts for secrets through `sync: false` instead of committing their values. Render documents these fields for native Node web services and Blueprints. [2]
+Render reads the root `render.yaml` Blueprint. The Blueprint defines a Node **free** web service, custom build and start commands, `/health`, and prompts for secrets through `sync: false` instead of committing their values. Render documents these fields for native Node web services and Blueprints. [2]
 
 Create a Blueprint from this repository, provide the same backend variables listed for Railway, and set the final public Render URL as `BACKEND_URL`. Confirm the service returns a successful `GET /health` response after the first deployment.
+
+> **Free-tier behavior:** Render spins down an idle Free web service after 15 minutes; the next request wakes it, which can take about one minute. Free services receive 750 instance-hours per workspace each month and use an ephemeral local filesystem, which is compatible with this stateless API because cultural records remain in MongoDB Atlas. [3]
 
 ## Deploy the frontend to Vercel
 
@@ -168,3 +170,4 @@ First decide the exact frontend and backend domains. Set `FRONTEND_URL` and `BAC
 
 [1]: https://docs.railway.com/config-as-code/reference "Railway Config as Code reference"
 [2]: https://render.com/docs/blueprint-spec "Render Blueprint specification"
+[3]: https://render.com/docs/free "Render Free instance documentation"

@@ -59,3 +59,7 @@
 - [x] Expand deployment documentation with local, Docker, Railway, Render, and Vercel workflows.
 - [x] Validate frontend build, backend startup, health check, CORS behavior, and automated tests.
 - [x] Move deprecated pnpm package configuration into the current workspace configuration file.
+- [ ] Create the Render free-tier backend web service from the Render Blueprint and configure its protected variables.
+- [ ] Verify the deployed Render backend health endpoint and MongoDB-backed culture API.
+- [ ] Set Vercel `VITE_API_BASE_URL` to the Render API origin and redeploy the frontend.
+- [ ] Verify the live Vercel-to-Render records, OAuth, and map flows.
