@@ -37,7 +37,7 @@ server/
 └── mongodb.ts                     # Safe cached MongoDB Atlas connection
 
 server/vercelHandler.ts            # Source for the Vercel serverless wrapper
-api/[...path].js                   # Generated during the Vercel build; not committed
+api/[...path].js                   # Bundled Vercel function entrypoint; committed for function discovery
 ```
 
 The `server/_core/` folder is framework infrastructure. It is normally left alone; application features belong in the files listed above.
@@ -67,7 +67,7 @@ When a visitor changes a filter, `Home.tsx` creates a small filter object. tRPC 
 | `pnpm check` | Check TypeScript types. |
 | `pnpm test` | Run automated client and server tests. |
 | `pnpm build` | Build the Vite frontend and local Express server. |
-| `pnpm build:vercel` | Build only the static Vite frontend for Vercel into `dist/public`. |
+| `pnpm build:vercel` | Build the Vite frontend into `dist/public` and refresh the committed Vercel API handler. |
 
 The server needs a secure `MONGODB_URI` to load real cultural records. Keep all credentials in deployment settings or a secure secret manager; never commit them to Git.
 

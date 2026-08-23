@@ -6,7 +6,9 @@
 dist/
 build/
 *.dist
-api/*.js
+
+# api/[...path].js is intentionally versioned. Vercel must see the catch-all
+# serverless entrypoint in the Git checkout before it runs the build command.
 
 # Environment variables
 .env

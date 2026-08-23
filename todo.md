@@ -35,6 +35,14 @@
 - [x] Diagnose and fix the Vercel serverless TypeScript build failure shown in deployment logs.
 - [x] Ensure Vercel can build the API function with the correct Express, MongoDB, and type dependencies.
 - [x] Document and validate the Vercel MongoDB Atlas environment-variable requirement.
-- [ ] Push the Vercel serverless build fix to GitHub main.
+- [x] Push the Vercel serverless build fix to GitHub main.
 - [ ] Verify Vercel has MONGODB_URI configured and Atlas permits the function's network access.
 - [ ] Test the live Vercel culture API after deployment to confirm MongoDB Atlas records load.
+- [ ] Diagnose the Vercel production API response for missing cultural records.
+- [ ] Verify the Vercel production environment has all required MongoDB and map-service variables.
+- [ ] Verify the live map loads after cultural records are restored.
+- [x] Reassess the masked Vercel MONGODB_URI and confirm it must not be interpreted as a placeholder from the screenshot.
+- [ ] Collect the production Vercel Function log and identify the actual culture API failure mode.
+- [ ] Commit the generated Vercel catch-all JavaScript handler so the API function exists in the Git checkout.
+- [ ] Update README language to identify the checked-in Vercel function artifact.
+- [ ] Push the committed handler to github/main and confirm the canonical branch contains it.
