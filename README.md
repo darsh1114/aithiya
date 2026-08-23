@@ -1,109 +1,170 @@
 # India Culture Explorer
 
-**India Culture Explorer** is a full-stack web application for discovering curated Indian festivals, traditions, foodways, and oral-performance stories on a searchable map.
+**India Culture Explorer** is a full-stack discovery application for exploring curated Indian festivals, traditions, foodways, and oral-performance stories on a searchable map.
 
-> **One-line project explanation:** The app reads approved cultural records from MongoDB Atlas, lets visitors filter them by search, category, and region, and keeps the result list synchronized with a map.
+> **One-line explanation:** Visitors explore 22 approved cultural records from MongoDB Atlas, filter them by search, category, and region, and see the same results on interactive map markers.
 
-## What the project does
+## Features
 
 | Feature | Simple explanation |
 |---|---|
-| Culture discovery | Visitors browse 22 researched pilot records across four cultural categories. |
-| Search and filters | A visitor can search words such as `Pongal`, choose a category, or select a region. |
-| Interactive map | Each visible record becomes a map marker; selecting a marker or result card focuses the same record. |
-| Trusted source links | Every record keeps its source URL, location, season, and public review status. |
-| Safe data management | Only approved records are public; owner-only actions can import the curated pilot. |
+| Culture discovery | Visitors browse 22 researched pilot records across festivals, traditions, foodways, and stories. |
+| Search and filters | A visitor can search a term such as `Pongal`, select a category, or choose a region. |
+| Synchronized map | Every visible record becomes a map marker; a marker and its result card select the same record. |
+| Trusted sources | Records include source URL, location, seasonal information, and approval status. |
+| Safe management | Public queries return only approved content; owner-only procedures import the curated pilot. |
 
-## Project map
+## Architecture
 
-The project is intentionally divided by responsibility. Start with the bold files when explaining the system.
-
-```text
-client/src/
-├── pages/Home.tsx                 # Main discovery screen
-├── components/CultureMap.tsx      # Turns records into map markers
-├── lib/cultureDiscovery.ts        # Small helpers for filters and labels
-└── lib/trpc.ts                    # Typed frontend-to-backend connection
-
-shared/
-├── culture.ts                     # One shared TypeScript shape for a culture record
-└── culturePilot.ts                # The 22 curated starter records
-
-server/
-├── app.ts                         # Shared Express app: routes, tRPC, OAuth, storage
-├── routers.ts                     # API actions available to the frontend
-├── cultureRepository.ts           # MongoDB read/write functions
-├── cultureImport.ts               # Validate → import the pilot dataset
-└── mongodb.ts                     # Safe cached MongoDB Atlas connection
-
-server/vercelHandler.ts            # Source for the Vercel serverless wrapper
-api/[...path].js                   # Bundled Vercel function entrypoint; committed for function discovery
-```
-
-The `server/_core/` folder is framework infrastructure. It is normally left alone; application features belong in the files listed above.
-
-## How data moves through the app
+The existing `client/` and `server/` folders already separate the frontend and backend clearly, so they remain in place. This avoids a high-risk file move while allowing them to be built and hosted independently.
 
 ```text
-MongoDB Atlas
-     ↓
-cultureRepository.ts
-     ↓
-routers.ts (tRPC API)
-     ↓
-Home.tsx
-     ↓
-CultureMap.tsx + result cards
+Vercel static frontend                         Railway or Render API
+──────────────────────                         ─────────────────────
+React + Vite                                   Express + tRPC
+VITE_API_BASE_URL ───── HTTPS ───────────────► /api/trpc
+Google Maps loader                             /health
+OAuth login handoff ◄──── HTTPS ───────────── /api/oauth/*
+                                                  │
+                                                  ├── MongoDB Atlas (culture data)
+                                                  └── MySQL/Drizzle (OAuth identities)
 ```
 
-When a visitor changes a filter, `Home.tsx` creates a small filter object. tRPC sends it to `routers.ts`, which calls `cultureRepository.ts`. MongoDB returns only matching **approved** records, and React redraws both the result cards and map markers.
+When the API is on another origin, `VITE_API_BASE_URL` supplies its public URL at frontend build time. The backend uses `FRONTEND_URL` and `BACKEND_URL` to apply CORS and complete OAuth safely. The login callback hands the session to the frontend using a URL fragment, then the existing client sends it as an authorization bearer fallback. This avoids depending on third-party cookies.
 
-## Run the project locally
+## Project structure
+
+```text
+client/                         React/Vite user interface
+  src/components/Map.tsx        Google Maps loader and fallback UI
+  src/lib/apiUrl.ts             Configurable API origin helper
+server/                         Express/tRPC application
+  app.ts                        Shared routes, CORS, and /health
+  standalone.ts                 Railway/Render/Docker API entrypoint
+  cultureRepository.ts          MongoDB cultural-record queries
+  deploymentConfig.ts           Origin validation and OAuth redirect safety
+  _core/                        Manus runtime and OAuth infrastructure
+shared/                         Shared TypeScript types and constants
+docker/                         Optional frontend/backend container definitions
+railway.json                    Railway backend build and health-check config
+render.yaml                     Render backend Blueprint
+vercel.json                     Vercel static frontend + serverless API config
+ENVIRONMENT.md                  Safe variable reference; no secrets included
+```
+
+## Local development
+
+Install dependencies once:
+
+```bash
+pnpm install
+```
+
+For the original integrated development experience, run the Vite frontend and Express API together:
+
+```bash
+pnpm dev
+```
+
+For independent-backend development, set matching local origins in your private environment, then start only the API:
+
+```bash
+FRONTEND_URL=http://localhost:4173 \
+BACKEND_URL=http://localhost:3000 \
+pnpm dev:backend
+```
+
+In a second terminal, point Vite to that backend. `VITE_API_BASE_URL` is public and must be present when the frontend is built.
+
+```bash
+VITE_API_BASE_URL=http://localhost:3000 pnpm exec vite --host 0.0.0.0
+```
 
 | Command | Purpose |
 |---|---|
-| `pnpm install` | Install project packages. |
-| `pnpm dev` | Start local development with the React UI and Express API. |
-| `pnpm check` | Check TypeScript types. |
-| `pnpm test` | Run automated client and server tests. |
-| `pnpm build` | Build the Vite frontend and local Express server. |
-| `pnpm build:vercel` | Build the Vite frontend into `dist/public` and refresh the committed Vercel API handler. |
+| `pnpm check` | Type-check the project. |
+| `pnpm test` | Run client, server, OAuth, CORS, and deployment-contract tests. |
+| `pnpm build:client` | Build the Vite frontend into `dist/public`. |
+| `pnpm build:backend` | Bundle the independent backend into `dist/standalone.js`. |
+| `pnpm start:backend` | Run the compiled backend using the platform-provided `PORT`. |
+| `curl http://localhost:3000/health` | Confirm that the backend process is healthy without querying a database. |
 
-The server needs a secure `MONGODB_URI` to load real cultural records. Keep all credentials in deployment settings or a secure secret manager; never commit them to Git.
+## Environment variables
 
-## Import the curated pilot
+Read [**ENVIRONMENT.md**](./ENVIRONMENT.md) before configuring a deployment. It documents every backend secret, cross-origin setting, and public `VITE_*` value without storing an `.env` file in Git.
 
-After configuring MongoDB Atlas, run:
+> **Important:** `FRONTEND_URL` and `BACKEND_URL` must be configured together for split hosting. For example, `FRONTEND_URL=https://your-site.vercel.app` and `BACKEND_URL=https://your-api.up.railway.app`. The backend deliberately stops on a partial configuration instead of silently redirecting OAuth to the wrong site.
+
+## Docker
+
+Docker is optional. The project contains separate production-oriented Dockerfiles for the API and static frontend plus a `docker-compose.yml` for local testing:
 
 ```bash
-pnpm tsx scripts/importCuratedCulturePilot.mjs
+# Supply values from your local secret manager rather than committing a .env file.
+docker compose up --build
 ```
 
-The importer validates each record first and uses MongoDB upserts, so running it again updates the same records instead of creating duplicates.
+The API is available on `http://localhost:3000/health` and the frontend on `http://localhost:4173`. The Compose configuration forwards all public Vite values needed for API access, OAuth, map loading, and optional analytics at **build time**; it keeps database URLs and server credentials only on the API container.
 
-## Explain it in a presentation
+The sandbox cannot run Docker, so perform this final container smoke test on a machine or CI runner with Docker before using the image in production.
+
+## Deploy the backend to Railway
+
+Railway reads the checked-in `railway.json`, which builds `pnpm build:backend`, starts `pnpm start:backend`, and checks `/health`. Railway’s current configuration reference documents these build, start, health-check, and restart settings. [1]
+
+Create a Railway service from this GitHub repository and configure these variables in its protected environment-variable UI: `FRONTEND_URL`, `BACKEND_URL`, `MONGODB_URI`, `DATABASE_URL`, `JWT_SECRET`, `OAUTH_SERVER_URL`, `VITE_APP_ID`, `OWNER_OPEN_ID`, `OWNER_NAME`, and any required server-side Forge variables. Set `BACKEND_URL` to the generated Railway domain and `FRONTEND_URL` to the final Vercel domain before deploying.
+
+After the deployment completes, verify:
+
+```bash
+curl https://your-api.up.railway.app/health
+```
+
+## Deploy the backend to Render
+
+Render reads the root `render.yaml` Blueprint. The Blueprint defines a Node web service, custom build and start commands, `/health`, and prompts for secrets through `sync: false` instead of committing their values. Render documents these fields for native Node web services and Blueprints. [2]
+
+Create a Blueprint from this repository, provide the same backend variables listed for Railway, and set the final public Render URL as `BACKEND_URL`. Confirm the service returns a successful `GET /health` response after the first deployment.
+
+## Deploy the frontend to Vercel
+
+Vercel can continue to serve the existing static Vite client. Before the Vercel build, set these **public build-time** variables:
+
+| Variable | Value |
+|---|---|
+| `VITE_API_BASE_URL` | Final Railway or Render API URL, without a trailing slash. |
+| `VITE_FRONTEND_FORGE_API_URL` | Map-loader Forge endpoint. |
+| `VITE_FRONTEND_FORGE_API_KEY` | Map-loader frontend credential. |
+| `VITE_APP_ID` and `VITE_OAUTH_PORTAL_URL` | Existing OAuth client settings. |
+| `VITE_ANALYTICS_ENDPOINT` and `VITE_ANALYTICS_WEBSITE_ID` | Optional analytics settings. |
+
+Vercel must rebuild after changing `VITE_*` values because Vite writes those public settings into the static bundle. For the current Vercel serverless option, see [**VERCEL_DEPLOYMENT.md**](./VERCEL_DEPLOYMENT.md). Do not place `MONGODB_URI`, `JWT_SECRET`, or server-only Forge credentials in Vercel frontend variables.
+
+## Production order of operations
+
+First decide the exact frontend and backend domains. Set `FRONTEND_URL` and `BACKEND_URL` in Railway or Render, then deploy the backend and confirm `/health`. Register `${BACKEND_URL}/api/oauth/callback` with the Manus OAuth application. Next set `VITE_API_BASE_URL=${BACKEND_URL}` plus the public map/OAuth settings in Vercel and redeploy the frontend. Finally reload the site, confirm cultural records appear, complete one login, and check the map.
+
+## Troubleshooting
+
+| Symptom | What to check |
+|---|---|
+| No cultural records | Open `${BACKEND_URL}/health`, then inspect the backend logs for `/api/trpc/culture.list`. Verify `MONGODB_URI`, Atlas database/user permissions, and Atlas Network Access. |
+| Browser CORS error | `FRONTEND_URL` must exactly match the frontend origin, without a path. Configure `BACKEND_URL` at the same time and redeploy the backend. |
+| Login returns to API instead of UI | Confirm both origins are set and `${BACKEND_URL}/api/oauth/callback` is registered with the OAuth provider. |
+| Map unavailable | Verify Vercel has both `VITE_FRONTEND_FORGE_API_URL` and `VITE_FRONTEND_FORGE_API_KEY`, then rebuild. The map loader already shows a retry/fallback state. |
+| Vercel UI loads but API fails | Inspect the latest Function logs and ensure `api/[...path].js` is present in the deployment source. The handler is intentionally committed for discovery. |
+
+## Presentation-ready explanations
 
 | Question | Student-friendly answer |
 |---|---|
-| Why React? | It makes the map, filters, and result cards update instantly when state changes. |
-| Why TypeScript? | It catches mistakes by defining one clear `CultureRecord` shape used by both frontend and backend. |
-| Why tRPC? | It gives typed API calls without manually writing separate REST request code. |
-| Why MongoDB Atlas? | Cultural records have nested data such as location, source, and seasonal months, which fit naturally in documents. |
-| How is the map synchronized? | The selected record slug is shared state; a marker or result card changes the same value. |
-| How is public content protected? | Public queries always request only records whose status is `approved`; import and connection actions are role-protected. |
-
-## Deployment
-
-For Manus hosting, use the normal project publishing workflow. For Vercel, use `pnpm build:vercel` and set the output directory to **`dist/public`**. The checked-in [`VERCEL_DEPLOYMENT.md`](./VERCEL_DEPLOYMENT.md) explains the Vite frontend and serverless API split.
-
-## Technology reference
-
-See the short, presentation-ready [**TECH_STACK.md**](./TECH_STACK.md) file.
+| Why React? | It updates the map, filters, and result cards when a visitor changes state. |
+| Why TypeScript? | It catches mistakes by using a clear `CultureRecord` shape across the frontend and backend. |
+| Why tRPC? | It provides typed API calls without manually writing separate REST request code. |
+| Why MongoDB Atlas? | Cultural records have nested source, location, and seasonal data that fit naturally in documents. |
+| Why separate hosting? | Vercel can serve a fast static frontend while Railway or Render runs the API, database integrations, health checks, and server secrets. |
 
 ## References
 
-[1]: https://react.dev/ "React documentation"
-[2]: https://www.typescriptlang.org/docs/ "TypeScript documentation"
-[3]: https://trpc.io/docs "tRPC documentation"
-[4]: https://www.mongodb.com/docs/atlas/ "MongoDB Atlas documentation"
-[5]: https://vite.dev/guide/ "Vite documentation"
+[1]: https://docs.railway.com/config-as-code/reference "Railway Config as Code reference"
+[2]: https://render.com/docs/blueprint-spec "Render Blueprint specification"

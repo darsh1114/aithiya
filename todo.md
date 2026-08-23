@@ -46,3 +46,16 @@
 - [x] Commit the generated Vercel catch-all JavaScript handler so the API function exists in the Git checkout.
 - [x] Update README language to identify the checked-in Vercel function artifact.
 - [x] Push the committed handler to github/main and confirm the canonical branch contains it.
+- [x] Preserve the existing client/server folders while documenting their independent hosting boundaries.
+- [x] Add a production-ready standalone backend start command, CORS policy, and `/health` endpoint.
+- [x] Make the tRPC client’s backend origin configurable through a public build-time environment variable.
+- [ ] Preserve the OAuth login callback flow when the frontend and backend use different origins.
+- [ ] Preserve authenticated tRPC requests across separately hosted frontend and backend origins without relying on third-party cookies.
+- [x] Validate required separate-hosting origins and add route-level OAuth redirect tests.
+- [x] Add a safe environment-variable reference, Railway configuration, and Render configuration for the standalone backend.
+- [x] Add Docker and Docker Compose support without embedding secrets or altering the managed deployment image.
+- [x] Wire all public OAuth and map build-time variables through the Docker frontend image.
+- [ ] Run a real Docker build and Compose smoke test outside the sandbox before relying on container deployment.
+- [x] Expand deployment documentation with local, Docker, Railway, Render, and Vercel workflows.
+- [x] Validate frontend build, backend startup, health check, CORS behavior, and automated tests.
+- [x] Move deprecated pnpm package configuration into the current workspace configuration file.

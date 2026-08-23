@@ -93,6 +93,7 @@ var AXIOS_TIMEOUT_MS = 3e4;
 var UNAUTHED_ERR_MSG = "Please login (10001)";
 var NOT_ADMIN_ERR_MSG = "You do not have required permission (10002)";
 var OAUTH_STATE_COOKIE = "__Host-oauth_state";
+var encodeOAuthState = (state) => btoa(JSON.stringify(state));
 var decodeOAuthState = (state) => {
   let decoded;
   try {
@@ -1152,11 +1153,63 @@ async function createContext(opts) {
 
 // server/_core/oauth.ts
 import { parse as parseCookieHeader2 } from "cookie";
+
+// server/deploymentConfig.ts
+function normalizeOrigin(origin) {
+  return origin.trim().replace(/\/$/, "");
+}
+function getConfiguredFrontendOrigins(value = process.env.FRONTEND_URL ?? "") {
+  return value.split(",").map(normalizeOrigin).filter(Boolean);
+}
+function getRequestOrigin(req) {
+  const configuredBackendUrl = process.env.BACKEND_URL?.trim();
+  if (configuredBackendUrl) return normalizeOrigin(configuredBackendUrl);
+  const host = req.get("host");
+  if (!host) throw new Error("Request host is required to determine the backend URL");
+  return `${req.protocol}://${host}`;
+}
+function getSafeFrontendRedirect(returnTo, fallback, allowedOrigins) {
+  if (!returnTo) return fallback;
+  try {
+    const candidate = new URL(returnTo).origin;
+    return allowedOrigins.includes(candidate) ? candidate : fallback;
+  } catch {
+    return fallback;
+  }
+}
+function getOAuthCompletionRedirect(returnTo, fallback, allowedOrigins, backendOrigin, sessionToken) {
+  const redirectTarget = getSafeFrontendRedirect(returnTo, fallback, allowedOrigins);
+  if (normalizeOrigin(redirectTarget) === normalizeOrigin(backendOrigin)) {
+    return redirectTarget;
+  }
+  const url = new URL(redirectTarget);
+  url.hash = new URLSearchParams({ manus_session: sessionToken }).toString();
+  return url.toString();
+}
+
+// server/_core/oauth.ts
 function getQueryParam(req, key) {
   const value = req.query[key];
   return typeof value === "string" ? value : void 0;
 }
 function registerOAuthRoutes(app) {
+  app.get("/api/oauth/start", (req, res) => {
+    const frontendOrigins = getConfiguredFrontendOrigins();
+    const backendOrigin = getRequestOrigin(req);
+    const fallbackFrontendUrl = frontendOrigins[0] ?? backendOrigin;
+    const requestedReturnTo = getQueryParam(req, "returnTo");
+    const returnTo = getSafeFrontendRedirect(requestedReturnTo, fallbackFrontendUrl, frontendOrigins);
+    const nonce = crypto.randomUUID();
+    const redirectUri = `${backendOrigin}/api/oauth/callback`;
+    const state = encodeOAuthState({ redirectUri, nonce, returnTo });
+    const oauthUrl = new URL(`${process.env.OAUTH_SERVER_URL ?? ""}/app-auth`);
+    oauthUrl.searchParams.set("appId", process.env.VITE_APP_ID ?? "");
+    oauthUrl.searchParams.set("redirectUri", redirectUri);
+    oauthUrl.searchParams.set("state", state);
+    oauthUrl.searchParams.set("type", "signIn");
+    res.cookie(OAUTH_STATE_COOKIE, nonce, { path: "/", maxAge: 6e5, secure: true, sameSite: "none" });
+    res.redirect(302, oauthUrl.toString());
+  });
   app.get("/api/oauth/callback", async (req, res) => {
     const code = getQueryParam(req, "code");
     const state = getQueryParam(req, "state");
@@ -1164,7 +1217,7 @@ function registerOAuthRoutes(app) {
       res.status(400).json({ error: "code and state are required" });
       return;
     }
-    const { nonce } = decodeOAuthState(state);
+    const { nonce, returnTo } = decodeOAuthState(state);
     const expectedNonce = parseCookieHeader2(req.headers.cookie ?? "")[OAUTH_STATE_COOKIE];
     if (!nonce || nonce !== expectedNonce) {
       res.status(403).json({ error: "invalid oauth state" });
@@ -1191,7 +1244,13 @@ function registerOAuthRoutes(app) {
       });
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
-      res.redirect(302, "/");
+      const frontendOrigins = getConfiguredFrontendOrigins();
+      const backendOrigin = getRequestOrigin(req);
+      const fallbackFrontendUrl = frontendOrigins[0] ?? backendOrigin;
+      res.redirect(
+        302,
+        getOAuthCompletionRedirect(returnTo, fallbackFrontendUrl, frontendOrigins, backendOrigin, sessionToken)
+      );
     } catch (error) {
       console.error("[OAuth] Callback failed", error);
       res.status(500).json({ error: "OAuth callback failed" });
@@ -1241,10 +1300,34 @@ function registerStorageProxy(app, pathPrefix = "/manus-storage") {
 }
 
 // server/app.ts
-function createApp({ storagePathPrefix = "/manus-storage" } = {}) {
+function getAllowedOrigins(allowedOrigins) {
+  return new Set(allowedOrigins?.map(normalizeOrigin) ?? getConfiguredFrontendOrigins());
+}
+function createApp({ storagePathPrefix = "/manus-storage", allowedOrigins } = {}) {
   const app = express();
+  const permittedOrigins = getAllowedOrigins(allowedOrigins);
+  app.set("trust proxy", 1);
+  app.use((req, res, next) => {
+    const requestOrigin = req.header("origin");
+    const normalizedOrigin = requestOrigin ? normalizeOrigin(requestOrigin) : void 0;
+    if (normalizedOrigin && permittedOrigins.has(normalizedOrigin)) {
+      res.header("Access-Control-Allow-Origin", normalizedOrigin);
+      res.header("Access-Control-Allow-Credentials", "true");
+      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+      res.vary("Origin");
+    }
+    if (req.method === "OPTIONS" && req.path.startsWith("/api/")) {
+      res.sendStatus(204);
+      return;
+    }
+    next();
+  });
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  app.get("/health", (_req, res) => {
+    res.status(200).json({ status: "ok", service: "india-culture-explorer-api" });
+  });
   registerStorageProxy(app, storagePathPrefix);
   registerOAuthRoutes(app);
   app.use(

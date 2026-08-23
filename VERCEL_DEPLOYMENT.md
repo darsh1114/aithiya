@@ -22,6 +22,12 @@ Set the server-side environment variables that the API function needs in Vercelâ
 
 The existing OAuth and storage code uses Manus-provided services. For a Vercel production deployment, ensure the OAuth callback URL includes `https://<your-vercel-domain>/api/oauth/callback` and confirm the required server credentials are valid outside Manus. If those built-in services are unavailable in the external environment, retain the Vercel static frontend and point `/api/*` to an external backend using a Vercel rewrite, or replace those service integrations.
 
+## Optional independent backend
+
+The repository now supports Railway or Render as an independent API host. In that layout, set Vercelâ€™s public `VITE_API_BASE_URL` to the final backend URL before the Vite build, and configure the backend with matching `FRONTEND_URL` and `BACKEND_URL` values. The frontend calls `https://<backend>/api/trpc` directly; the backend exposes `/health`, applies origin-specific CORS, and starts OAuth through `/api/oauth/start`.
+
+Use the dedicated instructions in [README.md](./README.md#deploy-the-backend-to-railway), [render.yaml](./render.yaml), [railway.json](./railway.json), and [ENVIRONMENT.md](./ENVIRONMENT.md). Do not mix this mode with the same-origin Vercel function configuration unless you deliberately keep the Vercel function as the backend.
+
 ## Validation
 
 Run `pnpm build:vercel` locally. It creates the Vite frontend in `dist/public` and refreshes the versioned serverless function source at `api/[...path].js`. Commit that refreshed file with any changes to `server/vercelHandler.ts` or its server-side dependencies. This lets Vercel use the JavaScript function entrypoint without separately compiling the shared Express/tRPC TypeScript tree.

@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
 import { startLogin } from "./const";
+import { getSessionTokenFromHash, getTrpcUrl, usesExternalApi } from "./lib/apiUrl";
 import "./index.css";
 
 // Analytics is optional. Loading it here avoids unresolved HTML placeholders
@@ -22,6 +23,18 @@ if (analyticsEndpoint && analyticsWebsiteId) {
 }
 
 const queryClient = new QueryClient();
+
+if (usesExternalApi()) {
+  const sessionToken = getSessionTokenFromHash(window.location.hash);
+  if (sessionToken) {
+    try {
+      sessionStorage.setItem("manus-cookie", `${COOKIE_NAME}=${sessionToken}`);
+      history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+    } catch {
+      // Browser storage is unavailable; the user can still browse public content.
+    }
+  }
+}
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
@@ -53,7 +66,7 @@ queryClient.getMutationCache().subscribe(event => {
 const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: "/api/trpc",
+      url: getTrpcUrl(),
       transformer: superjson,
       headers() {
         // Preview auto-login fallback: when the browser blocks iframe cookies
