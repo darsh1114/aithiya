@@ -109,9 +109,9 @@ export default function Home() {
     <div className="min-h-screen overflow-x-hidden bg-[#f7f5ee] text-[#25322c]">
       <header className="border-b border-[#15342b]/10 bg-[#f7f5ee]/90 backdrop-blur">
         <div className="mx-auto flex h-18 max-w-[1440px] items-center justify-between px-5 py-4 md:px-8">
-          <a href="/" className="group flex items-center gap-3" aria-label="India Culture Explorer home">
+          <a href="/" className="group flex items-center gap-3" aria-label="Aithiya home">
             <span className="grid h-9 w-9 place-items-center rounded-full bg-[#15342b] text-[#f4c968] shadow-[0_8px_20px_-10px_rgba(21,52,43,0.9)]"><Compass className="h-5 w-5" /></span>
-            <span><span className="block font-serif text-lg leading-none text-[#15342b]">India Culture Explorer</span><span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-[#b9602c]">Living culture atlas</span></span>
+            <span><span className="block font-serif text-lg leading-none text-[#15342b]">Aithiya</span><span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-[#b9602c]">Living culture atlas</span></span>
           </a>
           <div className="hidden items-center gap-2 md:flex"><span className="rounded-full border border-[#15342b]/10 bg-white px-3 py-1.5 text-xs font-semibold text-[#15342b]">Curated pilot</span><span className="rounded-full bg-[#15342b] px-3 py-1.5 text-xs font-semibold text-white">{recordCount} records</span></div>
         </div>

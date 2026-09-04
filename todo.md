@@ -82,3 +82,6 @@
 - [x] Confirm the application serves approved cultural records through public procedures with no login route or session gate.
 - [x] Document that authentication is reserved for future cultural-data submission and moderation actions, not public browsing.
 - [x] Disable Vercel Deployment Protection for the production domain and verify anonymous public viewing.
+- [x] Reapply the final Aithiya browser branding and Leaflet/OpenStreetMap live map after restoring the stable checkpoint.
+- [x] Validate the final branding/map implementation with type checks, unit tests, production builds, and preview screenshots.
+- [x] Save the final verified checkpoint for redeployment to the configured production pipeline.
