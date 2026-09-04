@@ -211,3 +211,30 @@
     }
   }
 }
+
+@layer components {
+  .culture-list-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(21, 52, 43, 0.28) transparent;
+  }
+
+  .culture-list-scroll::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .culture-list-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .culture-list-scroll::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: rgba(21, 52, 43, 0.28);
+    background-clip: padding-box;
+  }
+
+  .culture-list-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(21, 52, 43, 0.48);
+    background-clip: padding-box;
+  }
+}

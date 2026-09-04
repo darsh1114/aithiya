@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
 import { buildCultureListFilter, categoryPresentation, formatSeason, uniqueRegions } from "@/lib/cultureDiscovery";
 import { cn } from "@/lib/utils";
+import { discoveryContentClass, discoveryListClass } from "@/lib/uiLayout";
 import { ArrowUpRight, CalendarDays, ChevronRight, Compass, ExternalLink, MapPin, Search, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -20,7 +21,7 @@ function ResultCard({ record, isSelected, onSelect }: { record: CultureRecord; i
 
   return (
     <article className={cn(
-      "group relative rounded-2xl border bg-white p-4 transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_18px_36px_-28px_rgba(21,52,43,0.65)]",
+      "group relative rounded-2xl border bg-white p-3.5 transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_18px_36px_-28px_rgba(21,52,43,0.65)]",
       isSelected ? "border-[#b9602c] ring-2 ring-[#e9c0a8]/70" : "border-stone-200",
     )}>
       <button className="absolute inset-0 rounded-2xl" type="button" onClick={onSelect} aria-label={`Focus ${record.title} on the map`} />
@@ -113,19 +114,19 @@ export default function Home() {
             <span className="grid h-9 w-9 place-items-center rounded-full bg-[#15342b] text-[#f4c968] shadow-[0_8px_20px_-10px_rgba(21,52,43,0.9)]"><Compass className="h-5 w-5" /></span>
             <span><span className="block font-serif text-lg leading-none text-[#15342b]">Aithiya</span><span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-[#b9602c]">Living culture atlas</span></span>
           </a>
-          <div className="hidden items-center gap-2 md:flex"><span className="rounded-full border border-[#15342b]/10 bg-white px-3 py-1.5 text-xs font-semibold text-[#15342b]">Curated pilot</span><span className="rounded-full bg-[#15342b] px-3 py-1.5 text-xs font-semibold text-white">{recordCount} records</span></div>
+          <div className="hidden items-center gap-2 md:flex"><span className="rounded-full bg-[#15342b] px-3 py-1.5 text-xs font-semibold text-white">{recordCount} records</span></div>
         </div>
       </header>
 
       <main className="mx-auto max-w-[1440px] px-5 pb-12 pt-8 md:px-8 md:pt-12">
-        <section className="relative overflow-hidden rounded-[2rem] bg-[#15342b] px-6 py-8 text-white shadow-[0_30px_80px_-42px_rgba(21,52,43,0.9)] md:px-10 md:py-12">
+        <section className="relative overflow-hidden rounded-[2rem] bg-[#15342b] px-6 py-7 text-white shadow-[0_30px_80px_-42px_rgba(21,52,43,0.9)] md:px-10 md:py-9">
           <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[#f4c968]/15 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-[#b9602c]/15 blur-3xl" />
           <div className="relative grid gap-7 lg:grid-cols-[1fr_auto] lg:items-end">
             <div className="max-w-3xl">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1.5 text-xs font-semibold tracking-wide text-[#f4c968]"><Sparkles className="h-3.5 w-3.5" />Culture, connected to place</div>
               <h1 className="font-serif text-4xl leading-[1.02] tracking-tight md:text-6xl">Find the stories<br className="hidden md:block" /> behind the places.</h1>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-white/70 md:text-lg">Search the living traditions, festivals, foods, and performance stories that shape India’s cultural landscape.</p>
+              <p className="mt-4 max-w-xl text-sm leading-6 text-white/70 md:text-base">Search the living traditions, festivals, foods, and performance stories that shape India’s cultural landscape.</p>
             </div>
             <div className="flex gap-7 text-sm"><div><strong className="block font-serif text-3xl text-[#f4c968]">{recordCount}</strong><span className="text-white/60">records</span></div><div><strong className="block font-serif text-3xl text-[#f4c968]">{regionCount}</strong><span className="text-white/60">regions</span></div></div>
           </div>
@@ -144,15 +145,15 @@ export default function Home() {
           })}</div>
         </section>
 
-        <section className="mt-8 grid gap-7 xl:grid-cols-[minmax(0,1.05fr)_minmax(390px,0.95fr)]">
-          <div className="space-y-4 xl:sticky xl:top-5 xl:self-start">
+        <section className={discoveryContentClass}>
+          <div className="min-h-0 space-y-4 xl:sticky xl:top-5 xl:self-start">
             <CultureMap records={records} selectedSlug={selectedSlug} onSelect={setSelectedSlug} />
-            {selectedRecord ? <SelectedRecord record={selectedRecord} onClose={() => setSelectedSlug(null)} /> : <div className="rounded-2xl border border-dashed border-[#15342b]/20 bg-white/55 p-5 text-sm text-stone-500"><span className="font-semibold text-[#15342b]">Explore the map.</span> Select a marker or a result to see cultural context, best visiting time, and its documented source.</div>}
+            {selectedRecord ? <SelectedRecord record={selectedRecord} onClose={() => setSelectedSlug(null)} /> : null}
           </div>
 
-          <div>
-            <div className="mb-4 flex items-end justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#b9602c]">Search results</p><h2 className="mt-1 font-serif text-3xl text-[#15342b]">{recordsQuery.isLoading ? "Finding records…" : `${records.length} cultural ${records.length === 1 ? "record" : "records"}`}</h2></div><span className="hidden text-sm text-stone-500 sm:block">Map and list stay in sync</span></div>
-            {recordsQuery.isLoading ? <div className="grid gap-3">{Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-36 animate-pulse rounded-2xl border border-stone-200 bg-white" />)}</div> : recordsQuery.isError ? <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-rose-800"><strong>We couldn’t load cultural records.</strong><p className="mt-1 text-sm">Check the Render connection, then refresh this page.</p></div> : records.length ? <><div className="grid gap-3">{visibleRecords.map((record) => <ResultCard key={record.id} record={record} isSelected={record.slug === selectedSlug} onSelect={() => setSelectedSlug(record.slug)} />)}</div>{visibleRecords.length < records.length ? <Button variant="outline" className="mt-4 w-full border-[#15342b]/20 text-[#15342b]" onClick={() => setVisibleLimit((current) => current + 24)}>Load more records ({records.length - visibleRecords.length} remaining)</Button> : null}</> : <div className="rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-12 text-center"><Compass className="mx-auto h-7 w-7 text-[#b9602c]" /><h3 className="mt-4 font-serif text-2xl text-[#15342b]">No records match yet</h3><p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-stone-500">Try a different place, practice, or category—or return to the full cultural atlas.</p><Button onClick={clearFilters} className="mt-5 bg-[#15342b] text-white hover:bg-[#204a3d]"><ArrowUpRight className="mr-2 h-4 w-4" />Show all records</Button></div>}
+          <div className="flex min-h-0 flex-col xl:overflow-hidden">
+            <div className="mb-3 flex items-end justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#b9602c]">Search results</p><h2 className="mt-1 font-serif text-3xl text-[#15342b]">{recordsQuery.isLoading ? "Finding records…" : `${records.length} cultural ${records.length === 1 ? "record" : "records"}`}</h2></div></div>
+            {recordsQuery.isLoading ? <div className="grid gap-3">{Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-36 animate-pulse rounded-2xl border border-stone-200 bg-white" />)}</div> : recordsQuery.isError ? <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-rose-800"><strong>We couldn’t load cultural records.</strong><p className="mt-1 text-sm">Check the Render connection, then refresh this page.</p></div> : records.length ? <><div className={discoveryListClass}><div className="grid gap-2">{visibleRecords.map((record) => <ResultCard key={record.id} record={record} isSelected={record.slug === selectedSlug} onSelect={() => setSelectedSlug(record.slug)} />)}</div>{visibleRecords.length < records.length ? <Button variant="outline" className="mt-4 w-full border-[#15342b]/20 text-[#15342b]" onClick={() => setVisibleLimit((current) => current + 24)}>Load more records ({records.length - visibleRecords.length} remaining)</Button> : null}</div></> : <div className="rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-10 text-center"><Compass className="mx-auto h-7 w-7 text-[#b9602c]" /><h3 className="mt-4 font-serif text-2xl text-[#15342b]">No records match yet</h3><p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-stone-500">Try a different place, practice, or category—or return to the full cultural atlas.</p><Button onClick={clearFilters} className="mt-4 bg-[#15342b] text-white hover:bg-[#204a3d]"><ArrowUpRight className="mr-2 h-4 w-4" />Show all records</Button></div>}
           </div>
         </section>
       </main>

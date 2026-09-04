@@ -85,3 +85,9 @@
 - [x] Reapply the final Aithiya browser branding and Leaflet/OpenStreetMap live map after restoring the stable checkpoint.
 - [x] Validate the final branding/map implementation with type checks, unit tests, production builds, and preview screenshots.
 - [x] Save the final verified checkpoint for redeployment to the configured production pipeline.
+- [x] Audit and remove only non-functional UI clutter from the public discovery page.
+- [x] Contain the festival/results list in an independently scrollable responsive panel without changing its behavior.
+- [x] Verify desktop and small-screen layout, list scrolling, selection, filtering, and page containment.
+- [x] Interactively verify search, category, and region filters still work after the UI cleanup.
+- [x] Interactively verify map/card selection and selected-record dismissal still work after the UI cleanup with the isolated record-backed UI harness.
+- [x] Interactively confirm the results panel scrolls independently on desktop and mobile while the page remains contained.

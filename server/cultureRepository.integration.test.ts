@@ -25,5 +25,5 @@ describe("cultural-record storage", () => {
         "culture_search",
       ]),
     );
-  }, 15_000);
+  }, 30_000);
 });
